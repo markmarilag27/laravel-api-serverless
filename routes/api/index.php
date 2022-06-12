@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -12,5 +14,6 @@
 */
 
 Route::name('V1.')->prefix('v1')->group(function () {
+    // users
     require_once base_path('/routes/api/V1/users.php');
 });

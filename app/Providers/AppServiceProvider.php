@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Services\UserService;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -17,6 +17,7 @@ class AppServiceProvider extends ServiceProvider
         // local development only
         if ($this->app->environment('local')) {
             $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
+            Model::preventLazyLoading();
         }
     }
 
