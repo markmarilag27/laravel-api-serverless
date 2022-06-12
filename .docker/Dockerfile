@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:22.10
 
 LABEL maintainer="Mark Marilag <mark.marilag27@gmail.com>"
 
@@ -15,28 +15,31 @@ RUN apt-get update && \
     ca-certificates \
     zip \
     unzip \
-    nginx \
     supervisor \
     cron \
-    sqlite3 \
     libcap2-bin \
     libpng-dev \
     python2 \
     jpegoptim \
     optipng \
     pngquant \
-    gifsicle
+    gifsicle \
+    debian-keyring \
+    debian-archive-keyring \
+    apt-transport-https
 
 RUN mkdir -p ~/.gnupg && \
     chmod 600 ~/.gnupg && \
     echo "disable-ipv6" >> ~/.gnupg/dirmngr.conf && \
     apt-key adv --homedir ~/.gnupg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys E5267A6C && \
     apt-key adv --homedir ~/.gnupg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C300EE8C && \
-    echo "deb http://ppa.launchpad.net/ondrej/php/ubuntu hirsute main" > /etc/apt/sources.list.d/ppa_ondrej_php.list
+    echo "deb http://ppa.launchpad.net/ondrej/php/ubuntu hirsute main" > /etc/apt/sources.list.d/ppa_ondrej_php.list && \
+    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg && \
+    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
 
 RUN apt-get update && apt-get install -y \
+    caddy \
     php8.1-fpm \
-    php8.1-sqlite3 \
     php8.1-gd \
     php8.1-curl \
     php8.1-imap \
@@ -79,8 +82,8 @@ RUN mkdir -p /var/www/html && \
 
 RUN chown -R laravel:laravel /var/www/html && \
     chown -R laravel:laravel /run && \
-    chown -R laravel:laravel /var/lib/nginx && \
-    chown -R laravel:laravel /var/log/nginx && \
+    chown -R laravel:laravel /var/lib/caddy && \
+    chown -R laravel:laravel /var/log/caddy && \
     chown -R laravel:laravel /var/log/php && \
     chown -R laravel:laravel /tmp/laravel/storage/framework/views
 

@@ -60,11 +60,11 @@ Copy and edit environment file
 ```
 $ cp .env.example .env
 ```
-Run docker compose to build, run containers and access the php
+Run docker compose to build, run containers and access the app
 ```
 $ docker-compose up -d
 ...
-$ docker-compose exec -u laravel php bash
+$ bash ./run-exec-container.sh
 ```
 Install dependencies and telescope
 ```
@@ -77,11 +77,9 @@ Run the migration
 $ php artisan migrate
 ```
 ### Finding bugs on your code
-Run this three commands to make sure your codebase and app is tested
+Run this script before commit
 ```
-$ php artisan test
-$ ./vendor/bin/phpcs
-$ ./vendor/bin/psalm
+$ bash ./run-before-commit.sh
 ```
 ### Mailhog
 For viewing local email [Mail & Local Development](https://laravel.com/docs/9.x/mail#mail-and-local-development)
