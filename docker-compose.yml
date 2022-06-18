@@ -12,31 +12,58 @@ services:
         container_name: app
         restart: unless-stopped
         tty: true
+        depends_on:
+            - mysql
+            - mysql-testing
+            - dynamodb
+            - sqs
+            - mailhog
+            - minio
         ports:
-          - 80:80
-          - 443:443
+            - 80:80
+            - 443:443
         volumes:
             - ./:/var/www/html
             - ./.docker/Caddyfile:/etc/caddy/Caddyfile
             - ./.docker/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
             - ./.docker/fpm-pool.conf:/etc/php/8.1/fpm/pool.d/www.conf
-            - ./.docker/php.ini:/etc/php/8.1/fpm/conf.d/99-sail.ini
+            - ./.docker/php.ini:/etc/php/8.1/fpm/conf.d/101-php.ini
         networks:
             - default
 
     # Database
     mysql:
-        image: mysql:8
+        image: mysql/mysql-server:8.0
         container_name: mysql
         command: --default-authentication-plugin=mysql_native_password
         restart: unless-stopped
         ports:
             - ${DB_PORT:-3306}:3306
         environment:
+            MYSQL_DATABASE: homestead
+            MYSQL_USER: homestead
+            MYSQL_PASSWORD: secret
             MYSQL_ROOT_PASSWORD: password
         volumes:
-            - ./.docker/mysql-init:/docker-entrypoint-initdb.d
             - mysql-data:/var/lib/mysql/
+        networks:
+            - default
+
+    # Database
+    mysql-testing:
+        image: mysql/mysql-server:8.0
+        container_name: mysql-testing
+        command: --default-authentication-plugin=mysql_native_password
+        restart: unless-stopped
+        ports:
+            - 3307:3306
+        environment:
+            MYSQL_DATABASE: homestead_testing
+            MYSQL_USER: homestead
+            MYSQL_PASSWORD: secret
+            MYSQL_ROOT_PASSWORD: password
+        tmpfs:
+            - /var/lib/mysql:rw
         networks:
             - default
 

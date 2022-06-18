@@ -39,6 +39,8 @@ RUN mkdir -p ~/.gnupg && \
 
 RUN apt-get update && apt-get install -y \
     caddy \
+    php8.1 \
+    php8.1-cli \
     php8.1-fpm \
     php8.1-gd \
     php8.1-curl \
@@ -55,12 +57,13 @@ RUN apt-get update && apt-get install -y \
     php8.1-msgpack \
     php8.1-igbinary \
     php8.1-redis \
-    php8.1-pcov
+    php8.1-pcov \
+    php8.1-xdebug
 
-RUN php -r "readfile('http://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 RUN apt-get -y autoremove && \
-    apt-get clean && \
+    apt-get -y clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN groupadd --force -g 1000 laravel
@@ -68,7 +71,7 @@ RUN useradd -ms /bin/bash --no-user-group -g 1000 -u 1000 laravel
 
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY fpm-pool.conf /etc/php/8.1/fpm/pool.d/www.conf
-COPY php.ini /etc/php/8.1/fpm/conf.d/99-sail.ini
+COPY php.ini /etc/php/8.1/fpm/conf.d/101-php.ini
 
 COPY scheduler /etc/cron.d/scheduler
 
